@@ -78,7 +78,7 @@ const handleRegister = async () => {
         <el-form-item label="密码">
           <el-input
               v-model="registerForm.password"
-              placeholder="请输入密码"
+              placeholder="字母、数字和下划线组合，6-20位"
               type="password"
           />
         </el-form-item>

@@ -60,7 +60,7 @@ const handleUpload = async (file) => {
   formData.append('file', file.raw)
   try {
     const res = await uploadFile(formData)
-    form.value.img = res.data?.url || ''
+    form.value.img = res.data || ''
     ElMessage.success('上传成功')
   } catch {
     ElMessage.error('上传失败')
@@ -89,7 +89,7 @@ const handleBatchDelete = async () => {
   if (!selected.value.length) return
   try {
     await ElMessageBox.confirm('确定要删除选中的清单吗？', '提示', {type: 'warning'})
-    await deleteList({ids: selected.value})
+    await deleteList({ids: selected.value.join(',')})
     ElMessage.success('删除成功')
     selected.value = []
     fetchLists()

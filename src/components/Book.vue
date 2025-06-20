@@ -76,11 +76,16 @@
       <el-form :model="editForm" :rules="editRules" ref="editFormRef">
         <el-form-item label="分类" prop="categoryId" required>
           <el-select v-model="editForm.categoryId" placeholder="请选择分类">
-            <el-option v-for="item in allCategories" :key="item.id" :value="item.id">
-              <span>
-                <img v-if="item.logo" :src="item.logo" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;" />
-                {{ item.name }}
-              </span>
+            <el-option
+                v-for="item in allCategories"
+                :key="item.id"
+                :value="item.id"
+                :label="item.name"
+            >
+    <span>
+      <img v-if="item.logo" :src="item.logo" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;" />
+      {{ item.name }}
+    </span>
             </el-option>
           </el-select>
         </el-form-item>
@@ -103,21 +108,13 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { getBillList, deleteBill } from '@/apis/inOutCome'
 import { importBill, exportBill } from '@/apis/importAndExport.js'
 import { useIconStore } from '@/stores/iconStore.js'
 import { ElMessage } from 'element-plus'
 import { updateListItem } from '@/apis/shoppingLists'
-
-const categoryObj = computed({
-  get() {
-    return allCategories.value.find(c => c.id === searchForm.value.categoryId) || null
-  },
-  set(val) {
-    searchForm.value.categoryId = val ? val.id : ''
-  }
-})
+import dayjs from 'dayjs'
 
 const billList = ref([])
 const loading = ref(false)
@@ -127,7 +124,6 @@ const pageSize = ref(10)
 const multipleSelection = ref([])
 
 const searchForm = ref({
-  type: '', // 0支出1收入
   categoryId: '',
   startDate: '',
   endDate: '',
@@ -140,10 +136,6 @@ const allCategories = computed(() => {
   return [...iconStore.incomeIcons, ...iconStore.outcomeIcons]
 })
 
-const renderCategoryLabel = (item) => {
-  return item.logo ? `<img src="${item.logo}" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;" /> ${item.name}` : item.name
-}
-
 const fetchBillList = async () => {
   loading.value = true
   try {
@@ -152,8 +144,8 @@ const fetchBillList = async () => {
       pageSize: pageSize.value,
     }
     if (searchForm.value.categoryId) params.categoryId = searchForm.value.categoryId
-    if (searchForm.value.startDate) params.startDate = searchForm.value.startDate
-    if (searchForm.value.endDate) params.endDate = searchForm.value.endDate
+    if (searchForm.value.startDate) params.startDate = dayjs(searchForm.value.startDate).format('YYYY-MM-DD')
+    if (searchForm.value.endDate) params.endDate = dayjs(searchForm.value.endDate).format('YYYY-MM-DD')
     if (searchForm.value.keyword) params.remark = searchForm.value.keyword
     const res = await getBillList(params)
     billList.value = res.data.list || []
@@ -177,7 +169,6 @@ const handleSearch = () => {
 
 const handleReset = () => {
   searchForm.value = {
-    type: '',
     categoryId: '',
     startDate: '',
     endDate: '',
@@ -199,7 +190,7 @@ const handleSelectionChange = (val) => {
 
 const handleBatchDelete = async () => {
   if (!multipleSelection.value.length) return
-  await deleteBill(multipleSelection.value.map(item => item.id))
+  await deleteBill({ ids: multipleSelection.value.map(item => item.id).join(',') })
   fetchBillList()
   ElMessage.success('删除成功')
 }

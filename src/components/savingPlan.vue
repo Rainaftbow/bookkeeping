@@ -106,7 +106,7 @@ const handleBatchDelete = async () => {
   if (!selected.value.length) return
   try {
     await ElMessageBox.confirm('确定要删除选中的计划吗？', '提示', {type: 'warning'})
-    await deleteSavingPlan({ids: selected.value})
+    await deleteSavingPlan({ids: selected.value.join(',')})
     ElMessage.success('删除成功')
     selected.value = []
     await fetchPlans()

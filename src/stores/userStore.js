@@ -70,6 +70,28 @@ export const useUserStore = defineStore('user', {
                 ElMessage.error('请输入密码')
                 return false
             }
+            // 密码规范校验
+            const pwd = form.password;
+            // 1. 长度校验
+            if (pwd.length <= 6 || pwd.length >= 20) {
+                ElMessage.error('密码长度需大于6且小于20个字符')
+                return false
+            }
+            // 2. 只能包含字母、数字、下划线
+            if (!/^\w+$/.test(pwd)) {
+                ElMessage.error('密码只能包含字母、数字和下划线')
+                return false
+            }
+            // 3. 下划线不能在开头
+            if (/^_/.test(pwd)) {
+                ElMessage.error('密码不能以下划线开头')
+                return false
+            }
+            // 4. 必须包含字母和数字
+            if (!(/[a-zA-Z]/.test(pwd) && /[0-9]/.test(pwd))) {
+                ElMessage.error('密码必须包含字母和数字')
+                return false
+            }
             if (form.password !== form.confirmPassword) {
                 ElMessage.error('两次输入密码不一致')
                 return false
