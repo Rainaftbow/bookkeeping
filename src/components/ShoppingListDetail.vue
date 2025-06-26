@@ -3,6 +3,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
+  getList,
   addItem,
   updateListItem,
   deleteListItem,
@@ -44,7 +45,7 @@ function goBack() {
 
 async function fetchItems() {
   // getItem: { id } 返回清单详情，包含商品列表
-  const res = await getItem(listId)
+  const res = await getList(listId)
   let allItems = res.data?.items || []
   if (searchForm.name) {
     allItems = allItems.filter(i => i.name.includes(searchForm.name))
