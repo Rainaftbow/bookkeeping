@@ -8,6 +8,6 @@ export const addItem = (data) => service.post(`/shoppingList/item/addItem`, data
 export const updateList = (data) => service.put(`/shoppingList`, data)
 export const updateListItem = (data) => service.put(`/shoppingList/item`, data)
 export const deleteList = (params) => service.delete(`/shoppingList`, {params})
-export const deleteListItem = (params) => service.delete(`/shoppingList/item`, {params})
+export const deleteListItem = (params) => service.delete(`/shoppingList/item`, {params: params})
 export const getItem = (id) => service.get(`/shoppingList/item/${id}`)
 export const markListAsBought = (id) => service.post(`/shoppingList/status`, {params: id})

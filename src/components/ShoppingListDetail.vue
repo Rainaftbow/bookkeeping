@@ -10,6 +10,7 @@ import {
   markItemAsBought
 } from '@/apis/shoppingLists.js'
 import { useIconStore } from '@/stores/iconStore.js'
+import {all} from "axios";
 
 const route = useRoute()
 const router = useRouter()
@@ -47,6 +48,10 @@ async function fetchItems() {
   // getItem: { id } 返回清单详情，包含商品列表
   const res = await getList(listId)
   let allItems = res.data?.items || []
+  allItems = allItems.map(i => ({
+    ...i,
+    itemId: i.itemId ?? i.id // 兼容 itemId 或 id
+  }))
   if (searchForm.name) {
     allItems = allItems.filter(i => i.name.includes(searchForm.name))
   }
@@ -117,8 +122,8 @@ async function handleBatchDelete() {
   if (!multipleSelection.value.length) return
   try {
     await ElMessageBox.confirm('确定要删除选中的商品吗？', '提示', { type: 'warning' })
-    const ids = multipleSelection.value.map(i => i.itemId)
-    await deleteListItem({ ids })
+    const ids = multipleSelection.value.map(i => i.itemId).join(',')
+    await deleteListItem({ itemIds: ids })
     ElMessage.success('删除成功')
     fetchItems()
   } catch {}
@@ -126,6 +131,7 @@ async function handleBatchDelete() {
 
 async function handleMarkBought(item) {
   await markItemAsBought(1, item.itemId)
+  console.log(item.itemId)
   ElMessage.success('标记为已购买')
   fetchItems()
 }
